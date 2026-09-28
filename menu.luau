@@ -592,12 +592,50 @@ local function GlassLayer(parent, radius, transparency)
 	local glass = Instance.new("Frame")
 	glass.Name = "Glass"
 	glass.Size = UDim2.fromScale(1, 1)
-	glass.BackgroundColor3 = Color3.new(1, 1, 1)
-	glass.BackgroundTransparency = transparency or 0.985
+	glass.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	glass.BackgroundTransparency = transparency or 0.93
 	glass.BorderSizePixel = 0
+	glass.ClipsDescendants = true
 	glass.ZIndex = Z.Glass
 	glass.Parent = parent
 	Corner(glass, radius)
+
+	-- iOS 27 Liquid Glass Specular Reflection Sheen
+	local glassGrad = Instance.new("UIGradient")
+	glassGrad.Rotation = 45
+	glassGrad.Color = ColorSequence.new({
+		ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
+		ColorSequenceKeypoint.new(0.4, Color3.fromRGB(230, 240, 250)),
+		ColorSequenceKeypoint.new(1, Color3.fromRGB(160, 180, 200)),
+	})
+	glassGrad.Transparency = NumberSequence.new({
+		NumberSequenceKeypoint.new(0, 0.82),
+		NumberSequenceKeypoint.new(0.4, 0.94),
+		NumberSequenceKeypoint.new(1, 0.97),
+	})
+	glassGrad.Parent = glass
+
+	-- Curved Top Glass Refraction Edge Highlight
+	local topShine = Instance.new("Frame")
+	topShine.Name = "TopGlassShine"
+	topShine.Size = UDim2.new(1, 0, 0, 1.5)
+	topShine.Position = UDim2.new(0, 0, 0, 0)
+	topShine.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	topShine.BackgroundTransparency = 0.50
+	topShine.BorderSizePixel = 0
+	topShine.ZIndex = Z.Glass + 1
+	topShine.Parent = glass
+
+	local topShineGrad = Instance.new("UIGradient")
+	topShineGrad.Rotation = 0
+	topShineGrad.Transparency = NumberSequence.new({
+		NumberSequenceKeypoint.new(0, 1),
+		NumberSequenceKeypoint.new(0.2, 0.35),
+		NumberSequenceKeypoint.new(0.8, 0.35),
+		NumberSequenceKeypoint.new(1, 1),
+	})
+	topShineGrad.Parent = topShine
+
 	return glass
 end
  
@@ -2110,14 +2148,14 @@ function NullUI:CreateWindow(opts)
 	main.Position = UDim2.fromScale(0.5, IsMobileDevice and 0.5 or 0.55)
 	main.Size = size
 	main.BackgroundColor3 = NullUI.Theme.Background
-	main.BackgroundTransparency = 1
+	main.BackgroundTransparency = 0.22
 	main.BorderSizePixel = 0
 	main.ClipsDescendants = true
 	main.ZIndex = Z.Window
 	main.Parent = root
 	Corner(main, NullUI.Theme.CornerRadius)
-	Stroke(main, Color3.new(1, 1, 1), 1, 0.92)
-	GlassLayer(main, NullUI.Theme.CornerRadius, 0.985)
+	Stroke(main, Color3.fromRGB(255, 255, 255), 1, 0.78)
+	GlassLayer(main, NullUI.Theme.CornerRadius, 0.92)
  
 	local topbar = Instance.new("Frame")
 	topbar.Name = "TopBar"

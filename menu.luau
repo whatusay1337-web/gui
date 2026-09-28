@@ -9962,7 +9962,7 @@ function Tab:AddToggle(opts)
 	AddTitleDesc(card, textX, 66, opts.Text or "Toggle", opts.Description, height)
 	self._window:_RegisterSearchable(self, opts.Text or "Toggle", card)
  
-	-- Main Liquid Glass Track
+	-- Main Liquid Glass Track (ClipsDescendants prevents any edge bleeding/jaggedness)
 	local switchBg = Instance.new("Frame")
 	switchBg.AnchorPoint = Vector2.new(1, 0.5)
 	switchBg.Position = UDim2.new(1, -14, 0.5, 0)
@@ -9970,9 +9970,10 @@ function Tab:AddToggle(opts)
 	switchBg.BackgroundColor3 = state and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(34, 37, 41)
 	switchBg.BackgroundTransparency = state and 0.05 or 0.38
 	switchBg.BorderSizePixel = 0
+	switchBg.ClipsDescendants = true
 	switchBg.ZIndex = Z.Content + 1
 	switchBg.Parent = card
-	Corner(switchBg, 12)
+	Corner(switchBg, UDim.new(1, 0))
  
 	-- Glass Rim Stroke
 	local switchStroke = Stroke(
@@ -10006,7 +10007,7 @@ function Tab:AddToggle(opts)
 	glassHighlight.BorderSizePixel = 0
 	glassHighlight.ZIndex = Z.Content + 2
 	glassHighlight.Parent = switchBg
-	Corner(glassHighlight, 12)
+	Corner(glassHighlight, UDim.new(1, 0))
 
 	local glassHighlightGrad = Instance.new("UIGradient")
 	glassHighlightGrad.Rotation = 90
@@ -10030,7 +10031,7 @@ function Tab:AddToggle(opts)
 	knob.BorderSizePixel = 0
 	knob.ZIndex = Z.Content + 3
 	knob.Parent = switchBg
-	Corner(knob, 9)
+	Corner(knob, UDim.new(1, 0))
 
 	-- Knob Glass 3D Specular Highlight
 	local knobGradient = Instance.new("UIGradient")
@@ -10297,38 +10298,80 @@ function Tab:AddSlider(opts)
 	valueLabel.ZIndex = Z.Content + 1
 	valueLabel.Parent = card
  
+	-- Main Liquid Glass Slider Track Channel
 	local track = Instance.new("Frame")
-	track.Position = UDim2.new(0, 14, 1, -20)
-	track.Size = UDim2.new(1, -28, 0, 6)
-	-- Nearly transparent white overlay: no gray tint, so the window background
-	-- remains visible through the unfilled portion of the slider.
-	track.BackgroundColor3 = Color3.new(1, 1, 1)
-	track.BackgroundTransparency = 0.91
+	track.Position = UDim2.new(0, 14, 1, -22)
+	track.Size = UDim2.new(1, -28, 0, 10)
+	track.BackgroundColor3 = Color3.fromRGB(34, 37, 42)
+	track.BackgroundTransparency = 0.35
 	track.BorderSizePixel = 0
+	track.ClipsDescendants = true
 	track.ZIndex = Z.Content + 1
 	track.Parent = card
-	Corner(track, 3)
+	Corner(track, UDim.new(1, 0))
+
+	-- Track Glass Rim Stroke
+	local trackStroke = Stroke(track, Color3.fromRGB(220, 230, 240), 1, 0.72)
+
+	-- Specular Light Reflection Gradient across Track
+	local trackGradient = Instance.new("UIGradient")
+	trackGradient.Rotation = 45
+	trackGradient.Color = ColorSequence.new({
+		ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
+		ColorSequenceKeypoint.new(0.5, Color3.fromRGB(230, 238, 245)),
+		ColorSequenceKeypoint.new(1, Color3.fromRGB(170, 185, 195)),
+	})
+	trackGradient.Transparency = NumberSequence.new({
+		NumberSequenceKeypoint.new(0, 0.40),
+		NumberSequenceKeypoint.new(0.5, 0.75),
+		NumberSequenceKeypoint.new(1, 0.88),
+	})
+	trackGradient.Parent = track
+
+	local trackScale = Instance.new("UIScale")
+	trackScale.Scale = 1
+	trackScale.Parent = track
  
+	-- Liquid Fill Bar
 	local fill = Instance.new("Frame")
-	fill.BackgroundColor3 = Color3.new(1, 1, 1)
-	fill.BackgroundTransparency = 0
+	fill.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	fill.BackgroundTransparency = 0.05
 	fill.BorderSizePixel = 0
 	fill.Size = UDim2.new(SafeAlpha(value, min, max), 0, 1, 0)
 	fill.ZIndex = Z.Content + 2
 	fill.Parent = track
-	Corner(fill, 3)
+	Corner(fill, UDim.new(1, 0))
+
+	local fillGrad = Instance.new("UIGradient")
+	fillGrad.Rotation = 90
+	fillGrad.Color = ColorSequence.new({
+		ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
+		ColorSequenceKeypoint.new(1, Color3.fromRGB(215, 225, 235)),
+	})
+	fillGrad.Parent = fill
  
+	-- Liquid Glass Droplet Orb Knob
 	local knob = Instance.new("Frame")
 	knob.AnchorPoint = Vector2.new(0.5, 0.5)
 	knob.Position = UDim2.new(SafeAlpha(value, min, max), 0, 0.5, 0)
-	knob.Size = UDim2.fromOffset(12, 12)
-	knob.BackgroundColor3 = Color3.new(1, 1, 1)
-	knob.BackgroundTransparency = 0
+	knob.Size = UDim2.fromOffset(18, 18)
+	knob.BackgroundColor3 = Color3.fromRGB(240, 244, 248)
+	knob.BackgroundTransparency = 0.02
 	knob.BorderSizePixel = 0
 	knob.ZIndex = Z.Content + 3
 	knob.Parent = track
-	Corner(knob, 6)
-	Stroke(knob, Color3.fromRGB(16, 16, 16), 2, 0)
+	Corner(knob, UDim.new(1, 0))
+
+	-- 3D Specular Highlight on Knob
+	local knobGradient = Instance.new("UIGradient")
+	knobGradient.Rotation = 45
+	knobGradient.Color = ColorSequence.new({
+		ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
+		ColorSequenceKeypoint.new(1, Color3.fromRGB(195, 202, 210)),
+	})
+	knobGradient.Parent = knob
+
+	local knobStroke = Stroke(knob, Color3.fromRGB(255, 255, 255), 1, 0.55)
  
 	if hasDesc then
 		local lastW = -1
@@ -10403,7 +10446,12 @@ function Tab:AddSlider(opts)
  
 	local function releaseSlider()
 		if ActiveSliderOwner == sliderOwner then ActiveSliderOwner = nil end
-		dragging = false
+		if dragging then
+			dragging = false
+			Tween(knob, { Size = UDim2.fromOffset(18, 18) }, 0.16, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
+			Tween(trackScale, { Scale = 1 }, 0.16, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
+			Tween(trackGradient, { Rotation = 45 }, 0.16)
+		end
 		sliderInput = nil
 		stopFollow()
 	end
@@ -10431,6 +10479,12 @@ function Tab:AddSlider(opts)
 		ActiveSliderOwner = sliderOwner
 		dragging = true
 		sliderInput = input
+
+		-- Fluid Liquid Morphing on Press/Drag
+		Tween(knob, { Size = UDim2.fromOffset(24, 14) }, 0.14, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
+		Tween(trackScale, { Scale = 0.96 }, 0.10, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+		Tween(trackGradient, { Rotation = 70 }, 0.14)
+
 		updateFromX(input.Position.X)
  
 		stopFollow()

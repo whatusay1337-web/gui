@@ -9962,81 +9962,206 @@ function Tab:AddToggle(opts)
 	AddTitleDesc(card, textX, 66, opts.Text or "Toggle", opts.Description, height)
 	self._window:_RegisterSearchable(self, opts.Text or "Toggle", card)
  
+	-- Main Liquid Glass Track
 	local switchBg = Instance.new("Frame")
 	switchBg.AnchorPoint = Vector2.new(1, 0.5)
 	switchBg.Position = UDim2.new(1, -14, 0.5, 0)
-	switchBg.Size = UDim2.fromOffset(40, 22)
-	switchBg.BackgroundColor3 = state and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(46, 50, 49)
-	switchBg.BackgroundTransparency = state and 0 or 0.32
+	switchBg.Size = UDim2.fromOffset(42, 23)
+	switchBg.BackgroundColor3 = state and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(34, 37, 41)
+	switchBg.BackgroundTransparency = state and 0.05 or 0.38
 	switchBg.BorderSizePixel = 0
 	switchBg.ZIndex = Z.Content + 1
 	switchBg.Parent = card
-	Corner(switchBg, 11)
+	Corner(switchBg, 12)
  
-	-- The disabled state stays translucent so the window background remains visible
-	-- through the control instead of turning into a flat gray pill.
+	-- Glass Rim Stroke
 	local switchStroke = Stroke(
 		switchBg,
-		state and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(205, 212, 209),
+		state and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(220, 230, 235),
 		1,
-		state and 0.88 or 0.72
+		state and 0.85 or 0.70
 	)
  
+	-- Liquid Glass Specular Gradient Reflection
 	local switchGradient = Instance.new("UIGradient")
-	switchGradient.Rotation = 90
+	switchGradient.Rotation = 45
 	switchGradient.Color = ColorSequence.new({
 		ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
-		ColorSequenceKeypoint.new(1, Color3.fromRGB(190, 198, 194)),
+		ColorSequenceKeypoint.new(0.45, Color3.fromRGB(235, 242, 248)),
+		ColorSequenceKeypoint.new(1, Color3.fromRGB(175, 190, 200)),
 	})
 	switchGradient.Transparency = NumberSequence.new({
-		NumberSequenceKeypoint.new(0, state and 0 or 0.76),
-		NumberSequenceKeypoint.new(1, state and 0 or 0.94),
+		NumberSequenceKeypoint.new(0, state and 0.02 or 0.45),
+		NumberSequenceKeypoint.new(0.5, state and 0.08 or 0.78),
+		NumberSequenceKeypoint.new(1, state and 0.15 or 0.90),
 	})
 	switchGradient.Parent = switchBg
+
+	-- Glass Gloss Refraction Highlight Frame
+	local glassHighlight = Instance.new("Frame")
+	glassHighlight.Size = UDim2.new(1, 0, 0.48, 0)
+	glassHighlight.Position = UDim2.new(0, 0, 0, 0)
+	glassHighlight.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	glassHighlight.BackgroundTransparency = state and 0.75 or 0.88
+	glassHighlight.BorderSizePixel = 0
+	glassHighlight.ZIndex = Z.Content + 2
+	glassHighlight.Parent = switchBg
+	Corner(glassHighlight, 12)
+
+	local glassHighlightGrad = Instance.new("UIGradient")
+	glassHighlightGrad.Rotation = 90
+	glassHighlightGrad.Transparency = NumberSequence.new({
+		NumberSequenceKeypoint.new(0, 0.2),
+		NumberSequenceKeypoint.new(1, 1),
+	})
+	glassHighlightGrad.Parent = glassHighlight
  
 	local switchScale = Instance.new("UIScale")
 	switchScale.Scale = 1
 	switchScale.Parent = switchBg
  
+	-- Liquid Glass Knob (Fluid Droplet Orb)
 	local knob = Instance.new("Frame")
-	knob.Size = UDim2.fromOffset(16, 16)
-	knob.Position = state and UDim2.new(1, -19, 0.5, 0) or UDim2.new(0, 3, 0.5, 0)
+	knob.Size = UDim2.fromOffset(17, 17)
+	knob.Position = state and UDim2.new(1, -20, 0.5, 0) or UDim2.new(0, 3, 0.5, 0)
 	knob.AnchorPoint = Vector2.new(0, 0.5)
-	knob.BackgroundColor3 = state and Color3.fromRGB(18, 18, 18) or Color3.fromRGB(226, 230, 228)
-	knob.BackgroundTransparency = state and 0 or 0.06
+	knob.BackgroundColor3 = state and Color3.fromRGB(16, 18, 22) or Color3.fromRGB(240, 244, 246)
+	knob.BackgroundTransparency = state and 0 or 0.02
 	knob.BorderSizePixel = 0
-	knob.ZIndex = Z.Content + 2
+	knob.ZIndex = Z.Content + 3
 	knob.Parent = switchBg
-	Corner(knob, 8)
+	Corner(knob, 9)
+
+	-- Knob Glass 3D Specular Highlight
+	local knobGradient = Instance.new("UIGradient")
+	knobGradient.Rotation = 45
+	knobGradient.Color = ColorSequence.new({
+		ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
+		ColorSequenceKeypoint.new(1, Color3.fromRGB(200, 205, 210)),
+	})
+	knobGradient.Transparency = NumberSequence.new({
+		NumberSequenceKeypoint.new(0, state and 0.85 or 0.0),
+		NumberSequenceKeypoint.new(1, state and 0.95 or 0.2),
+	})
+	knobGradient.Parent = knob
+
+	-- Rim Outline around Knob
+	local knobStroke = Stroke(
+		knob,
+		state and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(255, 255, 255),
+		1,
+		state and 0.88 or 0.55
+	)
  
 	local click = Instance.new("TextButton")
 	click.Text = ""
 	click.AutoButtonColor = false
 	click.BackgroundTransparency = 1
 	click.Size = UDim2.fromScale(1, 1)
-	click.ZIndex = Z.Content + 3
+	click.ZIndex = Z.Content + 4
 	click.Parent = card
+
+	local isAnimating = false
  
-	local function render()
-		local anim = 0.28
-		local style, dir = Enum.EasingStyle.Quint, Enum.EasingDirection.InOut
-		Tween(switchBg, {
-			BackgroundColor3 = state and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(46, 50, 49),
-			BackgroundTransparency = state and 0 or 0.32,
-		}, anim, style, dir)
-		Tween(switchStroke, {
-			Color = state and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(205, 212, 209),
-			Transparency = state and 0.88 or 0.72,
-		}, anim, style, dir)
-		switchGradient.Transparency = NumberSequence.new({
-			NumberSequenceKeypoint.new(0, state and 0 or 0.76),
-			NumberSequenceKeypoint.new(1, state and 0 or 0.94),
-		})
-		Tween(knob, {
-			BackgroundColor3 = state and Color3.fromRGB(18, 18, 18) or Color3.fromRGB(226, 230, 228),
-			BackgroundTransparency = state and 0 or 0.06,
-			Position = state and UDim2.new(1, -19, 0.5, 0) or UDim2.new(0, 3, 0.5, 0),
-		}, anim, style, dir)
+	local function render(animate)
+		local duration = 0.26
+		local targetPos = state and UDim2.new(1, -20, 0.5, 0) or UDim2.new(0, 3, 0.5, 0)
+		local targetBgColor = state and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(34, 37, 41)
+		local targetBgTrans = state and 0.05 or 0.38
+		local targetStrokeColor = state and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(220, 230, 235)
+		local targetStrokeTrans = state and 0.85 or 0.70
+		local targetKnobColor = state and Color3.fromRGB(16, 18, 22) or Color3.fromRGB(240, 244, 246)
+		local targetKnobTrans = state and 0 or 0.02
+
+		if animate then
+			isAnimating = true
+			
+			-- 1. Elastic track scale pulse (Liquid compression)
+			Tween(switchScale, { Scale = 0.92 }, 0.08, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+			task.delay(0.08, function()
+				if switchScale.Parent then
+					Tween(switchScale, { Scale = 1.03 }, 0.12, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+					task.delay(0.12, function()
+						if switchScale.Parent then
+							Tween(switchScale, { Scale = 1 }, 0.12, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
+						end
+					end)
+				end
+			end)
+
+			-- 2. Liquid Glass Knob Morphing (Stretches into fluid droplet during travel)
+			Tween(knob, {
+				Size = UDim2.fromOffset(24, 15),
+				Position = targetPos,
+				BackgroundColor3 = targetKnobColor,
+				BackgroundTransparency = targetKnobTrans,
+			}, 0.18, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
+
+			-- 3. Dynamic Specular Light Shift across liquid surface
+			Tween(switchGradient, { Rotation = 75 }, 0.14, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+
+			-- 4. Elastic snap back to rounded orb
+			task.delay(0.16, function()
+				if knob.Parent then
+					Tween(knob, {
+						Size = UDim2.fromOffset(17, 17),
+					}, 0.16, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
+					Tween(switchGradient, { Rotation = 45 }, 0.16, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+					isAnimating = false
+				end
+			end)
+
+			-- 5. Track Color & Transparency Transitions
+			Tween(switchBg, {
+				BackgroundColor3 = targetBgColor,
+				BackgroundTransparency = targetBgTrans,
+			}, duration, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
+
+			Tween(glassHighlight, {
+				BackgroundTransparency = state and 0.75 or 0.88,
+			}, duration, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
+
+			Tween(switchStroke, {
+				Color = targetStrokeColor,
+				Transparency = targetStrokeTrans,
+			}, duration, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
+
+			Tween(knobStroke, {
+				Transparency = state and 0.88 or 0.55,
+			}, duration, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
+
+			switchGradient.Transparency = NumberSequence.new({
+				NumberSequenceKeypoint.new(0, state and 0.02 or 0.45),
+				NumberSequenceKeypoint.new(0.5, state and 0.08 or 0.78),
+				NumberSequenceKeypoint.new(1, state and 0.15 or 0.90),
+			})
+
+			knobGradient.Transparency = NumberSequence.new({
+				NumberSequenceKeypoint.new(0, state and 0.85 or 0.0),
+				NumberSequenceKeypoint.new(1, state and 0.95 or 0.2),
+			})
+		else
+			switchBg.BackgroundColor3 = targetBgColor
+			switchBg.BackgroundTransparency = targetBgTrans
+			glassHighlight.BackgroundTransparency = state and 0.75 or 0.88
+			switchStroke.Color = targetStrokeColor
+			switchStroke.Transparency = targetStrokeTrans
+			knob.Position = targetPos
+			knob.Size = UDim2.fromOffset(17, 17)
+			knob.BackgroundColor3 = targetKnobColor
+			knob.BackgroundTransparency = targetKnobTrans
+			knobStroke.Transparency = state and 0.88 or 0.55
+
+			switchGradient.Transparency = NumberSequence.new({
+				NumberSequenceKeypoint.new(0, state and 0.02 or 0.45),
+				NumberSequenceKeypoint.new(0.5, state and 0.08 or 0.78),
+				NumberSequenceKeypoint.new(1, state and 0.15 or 0.90),
+			})
+			knobGradient.Transparency = NumberSequence.new({
+				NumberSequenceKeypoint.new(0, state and 0.85 or 0.0),
+				NumberSequenceKeypoint.new(1, state and 0.95 or 0.2),
+			})
+		end
 	end
  
 	local signal = MakeSignal()
@@ -10048,31 +10173,44 @@ function Tab:AddToggle(opts)
 	local locked = opts.Locked == true
 	click.MouseButton1Click:Connect(function()
 		if locked then return end
-		Tween(switchScale, { Scale = 0.91 }, 0.08, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
-		task.delay(0.08, function()
-			if switchScale.Parent then
-				Tween(switchScale, { Scale = 1 }, 0.2, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
-			end
-		end)
 		state = not state
-		render()
+		render(true)
 		fireChanged(state)
+	end)
+
+	-- Press & Release Liquid Droplet Elasticity
+	click.InputBegan:Connect(function(input)
+		if not locked and (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) then
+			Tween(switchScale, { Scale = 0.94 }, 0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+			if not isAnimating then
+				Tween(knob, { Size = UDim2.fromOffset(20, 16) }, 0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+			end
+		end
+	end)
+
+	click.InputEnded:Connect(function(input)
+		if not locked and (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) then
+			Tween(switchScale, { Scale = 1 }, 0.15, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
+			if not isAnimating then
+				Tween(knob, { Size = UDim2.fromOffset(17, 17) }, 0.15, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
+			end
+		end
 	end)
  
 	card.MouseEnter:Connect(function()
 		if not locked then
 			Tween(card, { BackgroundTransparency = 0.93 }, 0.15)
 			if not state then
-				Tween(switchStroke, { Transparency = 0.55 }, 0.15)
-				Tween(switchBg, { BackgroundTransparency = 0.24 }, 0.15)
+				Tween(switchStroke, { Transparency = 0.50 }, 0.15)
+				Tween(switchBg, { BackgroundTransparency = 0.28 }, 0.15)
 			end
 		end
 	end)
 	card.MouseLeave:Connect(function()
 		Tween(card, { BackgroundTransparency = 0.96 }, 0.15)
 		if not state then
-			Tween(switchStroke, { Transparency = 0.72 }, 0.15)
-			Tween(switchBg, { BackgroundTransparency = 0.32 }, 0.15)
+			Tween(switchStroke, { Transparency = 0.70 }, 0.15)
+			Tween(switchBg, { BackgroundTransparency = 0.38 }, 0.15)
 		end
 	end)
  
@@ -10080,7 +10218,7 @@ function Tab:AddToggle(opts)
 		Instance = card,
 		Set = function(_, value, silent)
 			state = value == true
-			render()
+			render(true)
 			if not silent then fireChanged(state) end
 		end,
 		Get = function() return state end,

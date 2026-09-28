@@ -573,7 +573,7 @@ end
  
 local function Corner(parent, radius)
 	local c = Instance.new("UICorner")
-	c.CornerRadius = UDim.new(0, radius or NullUI.Theme.CornerRadius)
+	c.CornerRadius = typeof(radius) == "UDim" and radius or UDim.new(0, radius or NullUI.Theme.CornerRadius)
 	c.Parent = parent
 	return c
 end
@@ -10026,8 +10026,8 @@ function Tab:AddToggle(opts)
 	knob.Size = UDim2.fromOffset(17, 17)
 	knob.Position = state and UDim2.new(1, -20, 0.5, 0) or UDim2.new(0, 3, 0.5, 0)
 	knob.AnchorPoint = Vector2.new(0, 0.5)
-	knob.BackgroundColor3 = state and Color3.fromRGB(16, 18, 22) or Color3.fromRGB(240, 244, 246)
-	knob.BackgroundTransparency = state and 0 or 0.02
+	knob.BackgroundColor3 = state and Color3.fromRGB(0, 0, 0) or Color3.fromRGB(240, 244, 246)
+	knob.BackgroundTransparency = 0
 	knob.BorderSizePixel = 0
 	knob.ZIndex = Z.Content + 3
 	knob.Parent = switchBg
@@ -10036,22 +10036,25 @@ function Tab:AddToggle(opts)
 	-- Knob Glass 3D Specular Highlight
 	local knobGradient = Instance.new("UIGradient")
 	knobGradient.Rotation = 45
-	knobGradient.Color = ColorSequence.new({
+	knobGradient.Color = state and ColorSequence.new({
+		ColorSequenceKeypoint.new(0, Color3.fromRGB(50, 50, 50)),
+		ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 0, 0)),
+	}) or ColorSequence.new({
 		ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
 		ColorSequenceKeypoint.new(1, Color3.fromRGB(200, 205, 210)),
 	})
 	knobGradient.Transparency = NumberSequence.new({
-		NumberSequenceKeypoint.new(0, state and 0.85 or 0.0),
-		NumberSequenceKeypoint.new(1, state and 0.95 or 0.2),
+		NumberSequenceKeypoint.new(0, state and 0.5 or 0.0),
+		NumberSequenceKeypoint.new(1, state and 0.8 or 0.2),
 	})
 	knobGradient.Parent = knob
 
 	-- Rim Outline around Knob
 	local knobStroke = Stroke(
 		knob,
-		state and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(255, 255, 255),
+		state and Color3.fromRGB(0, 0, 0) or Color3.fromRGB(255, 255, 255),
 		1,
-		state and 0.88 or 0.55
+		state and 0.90 or 0.55
 	)
  
 	local click = Instance.new("TextButton")
@@ -10071,8 +10074,16 @@ function Tab:AddToggle(opts)
 		local targetBgTrans = state and 0.05 or 0.38
 		local targetStrokeColor = state and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(220, 230, 235)
 		local targetStrokeTrans = state and 0.85 or 0.70
-		local targetKnobColor = state and Color3.fromRGB(16, 18, 22) or Color3.fromRGB(240, 244, 246)
-		local targetKnobTrans = state and 0 or 0.02
+		local targetKnobColor = state and Color3.fromRGB(0, 0, 0) or Color3.fromRGB(240, 244, 246)
+		local targetKnobTrans = 0
+
+		knobGradient.Color = state and ColorSequence.new({
+			ColorSequenceKeypoint.new(0, Color3.fromRGB(50, 50, 50)),
+			ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 0, 0)),
+		}) or ColorSequence.new({
+			ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
+			ColorSequenceKeypoint.new(1, Color3.fromRGB(200, 205, 210)),
+		})
 
 		if animate then
 			isAnimating = true
@@ -10090,7 +10101,7 @@ function Tab:AddToggle(opts)
 				end
 			end)
 
-			-- 2. Liquid Glass Knob Morphing (Stretches into fluid droplet during travel)
+			-- 2. Liquid Glass Knob Morphing (Stretches into fluid droplet during travel & smooth color shift to black)
 			Tween(knob, {
 				Size = UDim2.fromOffset(24, 15),
 				Position = targetPos,
@@ -10128,7 +10139,8 @@ function Tab:AddToggle(opts)
 			}, duration, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
 
 			Tween(knobStroke, {
-				Transparency = state and 0.88 or 0.55,
+				Color = state and Color3.fromRGB(0, 0, 0) or Color3.fromRGB(255, 255, 255),
+				Transparency = state and 0.90 or 0.55,
 			}, duration, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
 
 			switchGradient.Transparency = NumberSequence.new({
@@ -10138,8 +10150,8 @@ function Tab:AddToggle(opts)
 			})
 
 			knobGradient.Transparency = NumberSequence.new({
-				NumberSequenceKeypoint.new(0, state and 0.85 or 0.0),
-				NumberSequenceKeypoint.new(1, state and 0.95 or 0.2),
+				NumberSequenceKeypoint.new(0, state and 0.5 or 0.0),
+				NumberSequenceKeypoint.new(1, state and 0.8 or 0.2),
 			})
 		else
 			switchBg.BackgroundColor3 = targetBgColor
@@ -10151,7 +10163,8 @@ function Tab:AddToggle(opts)
 			knob.Size = UDim2.fromOffset(17, 17)
 			knob.BackgroundColor3 = targetKnobColor
 			knob.BackgroundTransparency = targetKnobTrans
-			knobStroke.Transparency = state and 0.88 or 0.55
+			knobStroke.Color = state and Color3.fromRGB(0, 0, 0) or Color3.fromRGB(255, 255, 255)
+			knobStroke.Transparency = state and 0.90 or 0.55
 
 			switchGradient.Transparency = NumberSequence.new({
 				NumberSequenceKeypoint.new(0, state and 0.02 or 0.45),
@@ -10159,8 +10172,8 @@ function Tab:AddToggle(opts)
 				NumberSequenceKeypoint.new(1, state and 0.15 or 0.90),
 			})
 			knobGradient.Transparency = NumberSequence.new({
-				NumberSequenceKeypoint.new(0, state and 0.85 or 0.0),
-				NumberSequenceKeypoint.new(1, state and 0.95 or 0.2),
+				NumberSequenceKeypoint.new(0, state and 0.5 or 0.0),
+				NumberSequenceKeypoint.new(1, state and 0.8 or 0.2),
 			})
 		end
 	end
